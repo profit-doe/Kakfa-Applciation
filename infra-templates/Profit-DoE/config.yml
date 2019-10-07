@@ -1,7 +1,0 @@
-name: Containerized Profit environment
-description: |
-  Containerized Profit environment for using the profit with on-permises
-version: v1.0
-category: API Management Platform
-maintainer: Karthick Kumar
-company: Profit

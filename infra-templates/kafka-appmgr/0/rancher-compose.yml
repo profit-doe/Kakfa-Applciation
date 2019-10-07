@@ -1,0 +1,33 @@
+.catalog:
+    name: "Kafka Message events sevice"
+    version: "v1"
+    description: "Managing all message events in profit"
+    questions:
+        - variable: DNS_IP_VAL
+          description: "Internal DNS server IP"
+          label: "DNS"
+          type: "string"
+          default: 10.213.240.51
+          required: true
+
+zookeeper:
+  scale: 3
+  retain_ip: true
+  health_check:
+    port: 2181
+    interval: 5000
+    unhealthy_threshold: 3
+    request_line: ''
+    healthy_threshold: 2
+    response_timeout: 5000
+kafkabroker:
+  scale: 3
+  retain_ip: true
+  health_check:
+    port: 9092
+    interval: 5000
+    unhealthy_threshold: 3
+    request_line: ''
+    healthy_threshold: 2
+    response_timeout: 5000
+

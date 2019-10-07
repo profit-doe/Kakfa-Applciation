@@ -1,0 +1,7 @@
+name: Containerized Kafka Platform 
+description: |
+  Containerized kafka environment to process the messaged events handle in the profit.co which contains kafka, zookeeper for kafka containers 
+version: v1.0
+category: API Management Platform
+maintainer: Karthick Kumar
+company: Profit

@@ -1,0 +1,100 @@
+version: '2'
+services:
+  kafkabroker:
+    image: rawmind/alpine-kafka:0.10.2.0-2
+    environment:
+      ADVERTISE_PUB_IP: 'true'
+      CONFD_INTERVAL: '60'
+      JMX_PORT: '9093'
+      JVMFLAGS: -Xmx6144m -Xms6144m
+      KAFKA_DELETE_TOPICS: 'true'
+      KAFKA_LOG_DIRS: /opt/kafka/logs
+      KAFKA_LOG_RETENTION_HOURS: '720'
+      KAFKA_NUM_PARTITIONS: '3'
+      KAFKA_NUM_REPLICATION: '3'
+      ZK_SERVICE: zookeeper
+    tty: true
+    links:
+    - zookeeper:zookeeper
+    volumes_from:
+    - kafkabroker-volume
+    - kafkabroker-conf
+    ports:
+    - 9092:9092/tcp
+    - 9093:9093/tcp
+    labels:
+      io.rancher.scheduler.affinity:host_label: kafka=TRUE
+      io.rancher.sidekicks: kafkabroker-volume,kafkabroker-conf
+      io.rancher.container.hostname_override: container_name
+      io.rancher.scheduler.affinity:container_label_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}
+  zookeeper:
+    image: rawmind/alpine-zk:3.4.9
+    environment:
+      JVMFLAGS: -Xmx1000m -Xms1000m
+      ZK_DATA_DIR: /opt/zk/data
+      ZK_INIT_LIMIT: '10'
+      ZK_MAX_CLIENT_CXNS: '500'
+      ZK_SYNC_LIMIT: '10'
+      ZK_TICK_TIME: '10000'
+    dns:
+    - 10.213.240.51
+    - 10.213.240.52
+    tty: true
+    volumes_from:
+    - zookeeper-volume
+    - zookeeper-conf
+    ports:
+    - 2181:2181/tcp
+    labels:
+      io.rancher.scheduler.affinity:host_label: kafka=TRUE
+      io.rancher.sidekicks: zookeeper-volume,zookeeper-conf
+      io.rancher.container.hostname_override: container_name
+      io.rancher.scheduler.affinity:container_label_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}
+  kafkabroker-volume:
+    image: rawmind/alpine-volume:0.0.2-1
+    environment:
+      SERVICE_GID: '10003'
+      SERVICE_UID: '10003'
+      SERVICE_VOLUME: /opt/kafka/logs
+    volumes:
+    - /opt/kafka/logs
+    links:
+    - zookeeper:zookeeper
+    labels:
+      io.rancher.scheduler.affinity:host_label: kafka=TRUE
+      io.rancher.container.start_once: 'true'
+      io.rancher.container.hostname_override: container_name
+      io.rancher.scheduler.affinity:container_label_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}
+  zookeeper-conf:
+    image: rawmind/rancher-zk:3.4.8-5
+    volumes:
+    - /opt/tools
+    labels:
+      io.rancher.scheduler.affinity:host_label: kafka=TRUE
+      io.rancher.container.start_once: 'true'
+      io.rancher.container.hostname_override: container_name
+      io.rancher.scheduler.affinity:container_label_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}
+  zookeeper-volume:
+    image: rawmind/alpine-volume:0.0.2-1
+    environment:
+      SERVICE_GID: '10002'
+      SERVICE_UID: '10002'
+      SERVICE_VOLUME: /opt/zk/data
+    volumes:
+    - /opt/zk/data
+    labels:
+      io.rancher.scheduler.affinity:host_label: kafka=TRUE
+      io.rancher.container.start_once: 'true'
+      io.rancher.container.hostname_override: container_name
+      io.rancher.scheduler.affinity:container_label_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}
+  kafkabroker-conf:
+    image: profit/rancher-kafka:0.10.2.0-2
+    volumes:
+    - /opt/tools
+    links:
+    - zookeeper:zookeeper
+    labels:
+      io.rancher.scheduler.affinity:host_label: kafka=TRUE
+      io.rancher.container.start_once: 'true'
+      io.rancher.container.hostname_override: container_name
+      io.rancher.scheduler.affinity:container_label_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}

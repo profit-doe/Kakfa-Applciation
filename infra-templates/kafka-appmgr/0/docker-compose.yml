@@ -88,7 +88,7 @@ services:
       io.rancher.scheduler.affinity:host_label: kafka=TRUE
       io.rancher.scheduler.affinity:container_label_ne: io.rancher.stack_service.name=$${stack_name}/$${service_name}
   kafkabroker-conf:
-    image: profit/rancher-kafka:0.10.2.0-2
+    image: apptivo/rancher-kafka:0.10.2.0-2
     volumes:
     - /opt/tools
     links:
